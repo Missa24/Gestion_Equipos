@@ -3,9 +3,10 @@ import RootLayout from "@/components/layout/RootLayout";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Dashboard from "@/pages/Dashboard";
 import AuthPage from "@/pages/AuthPage";
-import Usuarios from "@/pages/UsuariosPage";
 import Reportes from "@/pages/ReportesPage";
 import { ProtectedRoute } from "@/components/login/ProtectedRoute";
+import { SupportPage } from "@/pages/SupportPage";
+import { SupportDetailPage } from "@/pages/SupportDetailPage";
 
 
 export const router = createBrowserRouter([
@@ -28,7 +29,8 @@ export const router = createBrowserRouter([
                 ),
                 children: [
                     { index: true, element: <Dashboard /> },
-                    { path: "usuarios", element: <Usuarios /> },
+                    { path: "soporte", element: <SupportPage /> },
+                    { path: "soporte/:id", element: <SupportDetailPage /> },
                     { path: "reportes", element: <Reportes /> },
                 ],
             },
