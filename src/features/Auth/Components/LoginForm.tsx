@@ -19,7 +19,6 @@ function LoginForm() {
     })
 
     function onSubmit(data: Login) {
-        console.log(data);
         LoginUser(data);
     }
 
