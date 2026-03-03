@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CreateNewSupport, getAllSupport, getSupportById, updateSupport } from "../service/SupportService";
-import { CreateSupportResponse, SupportFilters, SupportUpdate } from "../schema/SupportSchema";
+import { acceptSupport, CreateNewSupport, getAllSupport, getSupportById, updateSupport } from "../service/SupportService";
+import { CreateSupportResponse, SupportFilters, SupportPayload } from "../schema/SupportSchema";
 
 export function useCreateSupport() {
     const queryClient = useQueryClient();
@@ -41,7 +41,7 @@ export function useGetSupportById(id: number) {
 export function useUpdateSupport() {
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: ({ id, data }: { id: number; data: SupportUpdate }) =>
+        mutationFn: ({ id, data }: { id: number; data: SupportPayload }) =>
             updateSupport(id, data),
         onSuccess: () => {
             toast.success("Solicitud actualizada correctamente")
@@ -49,6 +49,22 @@ export function useUpdateSupport() {
         },
         onError: () => {
             toast.error("Error al actualizar la solicitud")
+        }
+    })
+}
+
+export function useAcceptSupport() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => acceptSupport(id),
+        onSuccess: (_, id) => {
+            toast.success("Solicitud aceptada correctamente");
+            queryClient.invalidateQueries({ queryKey: ["SupportList"] });
+            queryClient.invalidateQueries({ queryKey: ["Support", id] });
+        },
+
+        onError: () => {
+            toast.error("Error al aceptar la solicitud");
         }
     })
 }

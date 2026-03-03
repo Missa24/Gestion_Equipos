@@ -20,7 +20,8 @@ function formatDate(dateStr: string | null | undefined) {
 
 export function getColumns(
     onView: (row: Application) => void,
-    onEdit: (row: Application) => void
+    onEdit: (row: Application) => void,
+    rol: string
 ): ColumnDef<Application>[] {
     return [
         {
@@ -118,15 +119,17 @@ export function getColumns(
                         <Eye className="h-4 w-4" />
                         <span className="sr-only">Ver</span>
                     </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                        onClick={() => onEdit(row.original)}
-                    >
-                        <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Editar</span>
-                    </Button>
+                    {rol !== "USER" && (  // <-- ocultar para usuarios normales
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                            onClick={() => onEdit(row.original)}
+                        >
+                            <Pencil className="h-4 w-4" />
+                            <span className="sr-only">Editar</span>
+                        </Button>
+                    )}
                 </div>
             ),
             enableHiding: false,
