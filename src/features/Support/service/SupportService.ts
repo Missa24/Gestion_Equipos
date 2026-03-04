@@ -1,7 +1,7 @@
 import { apiService } from "@/api/api";
-import { CreateSupportResponse, SupportCreate, SupportFilters, SupportGetAll, SupportGetId, SupportUpdate } from "../schema/SupportSchema";
+import { CreateSupportResponse, SupportPayload, SupportFilters, SupportGetAll, SupportGetId } from "../schema/SupportSchema";
 
-export async function CreateNewSupport(data: SupportCreate): Promise<CreateSupportResponse> {
+export async function CreateNewSupport(data: SupportPayload): Promise<CreateSupportResponse> {
     const response = await apiService.post("/v1/support/", data)
     return response.data
 }
@@ -18,7 +18,12 @@ export async function getSupportById(id: number): Promise<SupportGetId> {
     return response.data
 }
 
-export async function updateSupport(id: number, data: SupportUpdate) {
+export async function updateSupport(id: number, data: SupportPayload) {
     const response = await apiService.put(`/v1/support/${id}`, data)
+    return response.data
+}
+
+export async function acceptSupport(id: number) {
+    const response = await apiService.patch(`/vi/support/${id}/aceptar`)
     return response.data
 }

@@ -145,3 +145,19 @@ export const SupportUpdateSchema = z.object({
 })
 
 export type SupportUpdate = z.infer<typeof SupportUpdateSchema>
+
+export const SupportPayloadSchema = z.object({
+    nro_de_solicitud: z.string().optional(),
+    id_usuario: z.number().optional(),
+    id_tecnico: z.number().optional(),
+    id_equipo: z.number().optional(),
+    estado: z.string().optional(),
+    prioridad: z.string().optional(),
+    problema: z.string().optional(),
+    resolucion: z.string().optional(),
+    observaciones: z.string().optional(),
+    fecha_solucion: z.union([z.date(), z.string().datetime().optional(), z.null()]).optional(),
+    duracion: z.union([z.date(), z.string().datetime().optional(), z.null()]).optional(),
+});
+
+export type SupportPayload = z.infer<typeof SupportPayloadSchema>;

@@ -6,43 +6,52 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useUpdateSupport } from '../hooks/SupportHooks'
-import { Application, SupportUpdate, SupportUpdateSchema } from '../schema/SupportSchema'
+import { useUpdateSupport, useCreateSupport } from '../hooks/SupportHooks'
+import { Application, SupportPayload, SupportPayloadSchema } from '../schema/SupportSchema'
 
 type FormSupportEditProps = {
-    data: Application
+    initialData?: Application
+    mode: "create" | "edit"
     onSuccess?: () => void
 }
 
-export const FormSupportEdit = ({ data, onSuccess }: FormSupportEditProps) => {
-    const { mutate: updateSupport, isPending } = useUpdateSupport()
+export const FormSupport = ({ initialData, mode, onSuccess }: FormSupportEditProps) => {
+    const { mutate: createSupport, isPending: creating } = useCreateSupport()
+    const { mutate: updateSupport, isPending: updating } = useUpdateSupport()
+    const isPending = creating || updating
 
-    const form = useForm<SupportUpdate>({
-        resolver: zodResolver(SupportUpdateSchema),
+
+    const form = useForm<SupportPayload>({
+        resolver: zodResolver(SupportPayloadSchema),
         defaultValues: {
-            problema: data.problema ?? "",
-            prioridad: data.prioridad ?? "",
-            estado: data.estado ?? "Pendiente",
-            resolucion: data.resolucion ?? "",
-            observaciones: data.observaciones ?? "",
-            id_equipo: data.id_equipo ?? 0,
-            id_usuario: data.id_usuario ?? 0,
-            id_tecnico: data.id_tecnico ?? undefined,
+            problema: initialData?.problema ?? "",
+            prioridad: initialData?.prioridad ?? "",
+            estado: initialData?.estado ?? "Pendiente",
+            resolucion: initialData?.resolucion ?? "",
+            observaciones: initialData?.observaciones ?? "",
+            id_equipo: initialData?.id_equipo ?? 0,
+            id_usuario: initialData?.id_usuario ?? 0,
+            id_tecnico: initialData?.id_tecnico ?? undefined,
         },
     })
 
-    function onSubmit(values: SupportUpdate) {
-        updateSupport(
-            { id: data.id_soporte, data: values },
-            { onSuccess: () => onSuccess?.() }
-        )
+    function onSubmit(values: SupportPayload) {
+        if (mode === "edit" && initialData) {
+            updateSupport({ id: initialData.id_soporte, data: values }, { onSuccess: () => onSuccess?.() })
+        } else {
+            createSupport(values, { onSuccess: () => onSuccess?.() })
+        }
     }
-
     return (
         <Card className="w-full">
             <CardHeader>
-                <CardTitle>Ticket: </CardTitle>
-                <CardDescription>{data.nro_de_solicitud}</CardDescription>
+                <CardTitle>
+                    {mode === "edit" ? "Editar Ticket" : "Nuevo Ticket"}
+                </CardTitle>
+
+                <CardDescription>
+                    {mode === "edit" ? initialData?.nro_de_solicitud : "Crear nueva solicitud"}
+                </CardDescription>
             </CardHeader>
 
             <CardContent>
@@ -204,7 +213,13 @@ export const FormSupportEdit = ({ data, onSuccess }: FormSupportEditProps) => {
 
                     <CardFooter className="mt-6 px-0 pb-0">
                         <Button type="submit" className="w-full" disabled={isPending}>
-                            {isPending ? "Guardando..." : "Guardar cambios"}
+                            {isPending
+                                ? mode === "edit"
+                                    ? "Guardando..."
+                                    : "Creando..."
+                                : mode === "edit"
+                                    ? "Guardar cambios"
+                                    : "Crear solicitud"}
                         </Button>
                     </CardFooter>
                 </form>

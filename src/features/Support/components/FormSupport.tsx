@@ -61,7 +61,6 @@ export const FormSupport = () => {
                                     </Field>
                                 )}
                             />
-
                             <Controller
                                 name='id_equipo'
                                 control={form.control}
@@ -80,7 +79,6 @@ export const FormSupport = () => {
                                     </Field>
                                 )}
                             />
-
                             <Controller
                                 name='prioridad'
                                 control={form.control}
@@ -102,7 +100,6 @@ export const FormSupport = () => {
                                     </Field>
                                 )}
                             />
-
                             <Controller
                                 name='estado'
                                 control={form.control}
@@ -113,7 +110,6 @@ export const FormSupport = () => {
                                     </Field>
                                 )}
                             />
-
                             <Controller
                                 name='observaciones'
                                 control={form.control}
@@ -132,13 +128,11 @@ export const FormSupport = () => {
                                 )}
                             />
                         </FieldGroup>
-
                         <CardFooter className="mt-4">
                             <Button type="submit" className="w-full">
                                 Crear Ticket
                             </Button>
                         </CardFooter>
-
                     </form>
                 </CardContent>
             </Card>

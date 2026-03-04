@@ -16,6 +16,7 @@ import {
     StickyNote,
     Wrench,
 } from 'lucide-react'
+import { useAcceptSupport } from '../hooks/SupportHooks'
 
 type DetailSupportProps = {
     id: number
@@ -29,9 +30,10 @@ function formatDate(dateStr: string | null | undefined) {
 export const DetailSupport = ({ id }: DetailSupportProps) => {
     const navigate = useNavigate()
     const { data: response, isLoading } = useGetSupportById(id)
+    const { mutate: acceptSupport, isPending } = useAcceptSupport();
     const soporte = response?.data
 
-    if (isLoading) {
+    if (isLoading || isPending) {
         return (
             <Skeleton className="h-[20px] w-[100px] rounded-full" />
         )
@@ -61,16 +63,24 @@ export const DetailSupport = ({ id }: DetailSupportProps) => {
                 <div className="flex items-center gap-2.5 flex-wrap">
                     <h1 className="text-xl font-semibold tracking-tight">Solicitud: {soporte.nro_de_solicitud}</h1>
                     <span
-                        className={`p-2 rounded-full flex items-center gap-1 ${soporte.estado === "Pendiente"
-                            ? "bg-red-200"
-                            : "bg-green-200"
-                            }`}
+                        className={`p-2 rounded-full flex items-center gap-1 `}
                     >
                         Estado: <p>{soporte.estado}</p>
                     </span>
                     <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${soporte.prioridad ?? 'bg-gray-50 text-gray-700 border-gray-200'}`}>
                         Prioridad: {soporte.prioridad}
                     </span>
+                    {
+                        soporte.estado === "Pendiente" && (
+                            <Button
+                                variant="acept"
+                                onClick={() => acceptSupport(soporte.id_soporte)}
+                                disabled={isPending}
+                            >
+                                {isPending ? "Aceptando..." : "Aceptar"}
+                            </Button>
+                        )
+                    }
                 </div>
             </div>
 
@@ -192,6 +202,8 @@ export const DetailSupport = ({ id }: DetailSupportProps) => {
                 <span>·</span>
                 <span>Modificado: {formatDate(soporte.fecha_modificacion)}</span>
             </div>
+
+
         </div>
     )
 }

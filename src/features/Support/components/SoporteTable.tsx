@@ -14,7 +14,6 @@ import {
     Search,
     Loader2,
 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -46,11 +45,13 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { getColumns } from "./ColumnsSupport"
 import { useNavigate } from "react-router-dom"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { FormSupportEdit } from "./FormSupportEdit"
-
+import { FormSupport } from "./FormSupportEdit"
+import { useAuthStore } from "@/stores/auth.store"
 
 
 export function SupportTable() {
+    const { user } = useAuthStore();
+    const role = user?.rol.nombre || "USER"
     const [page, setPage] = useState(1)
     const [searchInput, setSearchInput] = useState("")
     const [search, setSearch] = useState("")
@@ -92,8 +93,8 @@ export function SupportTable() {
     }, [])
 
     const columns = useMemo(
-        () => getColumns(handleView, handleEdit),
-        [handleView, handleEdit]
+        () => getColumns(handleView, handleEdit, role),
+        [handleView, handleEdit, role]
     )
 
     // eslint-disable-next-line react-hooks/incompatible-library
@@ -272,8 +273,9 @@ export function SupportTable() {
                         <DialogTitle>Editar Solicitud</DialogTitle>
                     </DialogHeader>
                     {editRow && (
-                        <FormSupportEdit
-                            data={editRow}
+                        <FormSupport
+                            initialData={editRow}
+                            mode="edit"
                             onSuccess={() => setEditRow(null)}
                         />
                     )}
