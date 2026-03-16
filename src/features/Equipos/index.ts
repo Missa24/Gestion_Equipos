@@ -1,16 +1,8 @@
-// src/features/Equipos/index.ts
-
-// Components
-export { default as EquiposPage } from './Components/EquiposPage';
-
-// Hooks
-export * from './Hooks/useEquipos';
-
-// Service
-export { EquipoService } from './Service/EquipoService';
-
-// Schema
-export * from './Schema/EquipoSchema';
-
-// Types
-export * from './Types/equipo.types';
+export { EquiposPage } from "./Components/EquiposPage";
+export { EquiposTable } from "./Components/EquiposTable";
+export { FormEquipo } from "./Components/FormEquipo";
+export { DetailEquipo } from "./Components/DetailEquipo";
+export { getEquipoColumns } from "./Components/ColumnsEquipo";
+export * from "./Schema/EquipoSchema";
+export * from "./Hooks/EquipoHooks";
+export * from "./Service/EquipoService";
