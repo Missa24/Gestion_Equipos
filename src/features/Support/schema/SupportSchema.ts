@@ -6,13 +6,13 @@ export const SupportCreateSchema = z.object({
     id_equipo: z.number(),
     prioridad: z.string(),
     observaciones: z.string(),
-    estado: z.string().default("Pendiente"),
+    estado: z.string(),
     resolucion: z.string().optional(),
     fecha_solucion: z.date().nullable().optional(),
 
 })
 
-export type SupportCreate = z.output<typeof SupportCreateSchema>;
+export type SupportCreate = z.infer<typeof SupportCreateSchema>;
 
 
 export const SupportCreateResponseSchema = z.object({

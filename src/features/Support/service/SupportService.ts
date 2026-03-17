@@ -24,6 +24,6 @@ export async function updateSupport(id: number, data: SupportPayload) {
 }
 
 export async function acceptSupport(id: number) {
-    const response = await apiService.patch(`/vi/support/${id}/aceptar`)
+    const response = await apiService.patch(`/v1/support/${id}/aceptar`)
     return response.data
 }
