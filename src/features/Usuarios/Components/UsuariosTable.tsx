@@ -316,14 +316,16 @@ export function UsuariosTable() {
 
             {/* Dialog: Crear */}
             <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
                     <DialogHeader>
                         <DialogTitle>Registrar usuario</DialogTitle>
                     </DialogHeader>
-                    <FormUsuario
-                        mode="create"
-                        onSuccess={() => setCreateOpen(false)}
-                    />
+                    <div className="overflow-y-auto flex-1 pr-1">
+                        <FormUsuario
+                            mode="create"
+                            onSuccess={() => setCreateOpen(false)}
+                        />
+                    </div>
                 </DialogContent>
             </Dialog>
 
@@ -332,17 +334,19 @@ export function UsuariosTable() {
                 open={!!editRow}
                 onOpenChange={(open: boolean) => !open && setEditRow(null)}
             >
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
                     <DialogHeader>
                         <DialogTitle>Editar usuario</DialogTitle>
                     </DialogHeader>
-                    {editRow && (
-                        <FormUsuario
-                            initialData={editRow}
-                            mode="edit"
-                            onSuccess={() => setEditRow(null)}
-                        />
-                    )}
+                    <div className="overflow-y-auto flex-1 pr-1">
+                        {editRow && (
+                            <FormUsuario
+                                initialData={editRow}
+                                mode="edit"
+                                onSuccess={() => setEditRow(null)}
+                            />
+                        )}
+                    </div>
                 </DialogContent>
             </Dialog>
 
@@ -351,11 +355,13 @@ export function UsuariosTable() {
                 open={!!viewRow}
                 onOpenChange={(open: boolean) => !open && setViewRow(null)}
             >
-                <DialogContent className="max-w-lg">
+                <DialogContent className="max-w-lg max-h-[90vh] flex flex-col">
                     <DialogHeader>
                         <DialogTitle>Detalle del usuario</DialogTitle>
                     </DialogHeader>
-                    {viewRow && <DetailUsuario usuario={viewRow} />}
+                    <div className="overflow-y-auto flex-1 pr-1">
+                        {viewRow && <DetailUsuario usuario={viewRow} />}
+                    </div>
                 </DialogContent>
             </Dialog>
 

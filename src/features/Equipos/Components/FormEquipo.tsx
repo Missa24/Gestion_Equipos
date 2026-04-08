@@ -22,15 +22,6 @@ type FormEquipoProps = {
     onSuccess?: () => void;
 };
 
-const MARCAS = ["Dell", "Aopen", "HP", "Lenovo", "Epson"];
-
-const MODELOS = [
-    "Laser Jet Pro 40",
-    "L655",
-    "L655 color negro",
-    "Ecotank L3350",
-];
-
 const TIPOS = [
     "Impresora",
     "Computadora portátil",
@@ -93,6 +84,11 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
                 <h3 className="text-base font-semibold leading-6">
                     {mode === "edit" ? "Editar equipo" : "Nuevo equipo"}
                 </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    {mode === "edit"
+                        ? `${initialData?.marca} ${initialData?.modelo} — N° ${initialData?.numero_serie}`
+                        : "Completa los campos para registrar un nuevo equipo."}
+                </p>
             </div>
 
             <Separator />
@@ -113,16 +109,11 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel>Marca</FieldLabel>
-                                        <Select value={field.value} onValueChange={field.onChange}>
-                                            <SelectTrigger aria-invalid={fieldState.invalid}>
-                                                <SelectValue placeholder="Seleccionar marca" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {MARCAS.map((m) => (
-                                                    <SelectItem key={m} value={m}>{m}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        <Input
+                                            {...field}
+                                            placeholder="Dell, HP, Lenovo…"
+                                            aria-invalid={fieldState.invalid}
+                                        />
                                         {fieldState.invalid && (
                                             <FieldError errors={[fieldState.error]} />
                                         )}
@@ -135,16 +126,11 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel>Modelo</FieldLabel>
-                                        <Select value={field.value} onValueChange={field.onChange}>
-                                            <SelectTrigger aria-invalid={fieldState.invalid}>
-                                                <SelectValue placeholder="Seleccionar modelo" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {MODELOS.map((m) => (
-                                                    <SelectItem key={m} value={m}>{m}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        <Input
+                                            {...field}
+                                            placeholder="OptiPlex 7050, ThinkPad…"
+                                            aria-invalid={fieldState.invalid}
+                                        />
                                         {fieldState.invalid && (
                                             <FieldError errors={[fieldState.error]} />
                                         )}
@@ -181,7 +167,7 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
                                         <Input
                                             {...field}
                                             value={field.value ?? ""}
-                                            placeholder="XXXXXX-XX"
+                                            placeholder="ACT-0001 (opcional)"
                                             aria-invalid={fieldState.invalid}
                                         />
                                         {fieldState.invalid && (
