@@ -4,17 +4,27 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const estadoColor: Record<string, string> = {
-    Activo: "bg-green-100 text-green-700 border-green-200",
-    Inactivo: "bg-gray-100 text-gray-600 border-gray-200",
-    "En mantenimiento": "bg-yellow-100 text-yellow-700 border-yellow-200",
-    Dañado: "bg-red-100 text-red-700 border-red-200",
+    Bueno: "bg-green-100 text-green-700 border-green-200",
+    Regular: "bg-gray-100 text-gray-600 border-gray-200",
+    Malo: "bg-red-100 text-red-700 border-red-200",
 };
 
 const tipoColor: Record<string, string> = {
-    Laptop: "bg-blue-100 text-blue-700 border-blue-200",
-    Desktop: "bg-purple-100 text-purple-700 border-purple-200",
-    Servidor: "bg-orange-100 text-orange-700 border-orange-200",
-    Impresora: "bg-teal-100 text-teal-700 border-teal-200",
+    Impresora: "bg-blue-100 text-blue-700 border-blue-200",
+    Computadora_portátil: "bg-purple-100 text-purple-700 border-purple-200",
+    Computadora_de_escritorio: "bg-orange-100 text-orange-700 border-orange-200",
+    Scanner: "bg-teal-100 text-teal-700 border-teal-200",
+    Disco_duro_externo: "bg-blue-100 text-blue-700 border-blue-200",
+    Servidor: "bg-purple-100 text-purple-700 border-purple-200",
+    Router: "bg-orange-100 text-orange-700 border-orange-200",
+    Router_switch: "bg-teal-100 text-teal-700 border-teal-200",
+    Tablet: "bg-blue-100 text-blue-700 border-blue-200",
+    Dispensador_automático_de_tickets: "bg-purple-100 text-purple-700 border-purple-200",
+    Memoria_RAM: "bg-orange-100 text-orange-700 border-orange-200",
+    UPS: "bg-teal-100 text-teal-700 border-teal-200",
+    Monitor: "bg-blue-100 text-blue-700 border-blue-200",
+    Cámara_de_seguridad: "bg-purple-100 text-purple-700 border-purple-200",
+    Faltante: "bg-orange-100 text-orange-700 border-orange-200",
 };
 
 function formatDate(dateStr: string | null | undefined) {

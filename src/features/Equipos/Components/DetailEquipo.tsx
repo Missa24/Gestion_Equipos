@@ -7,10 +7,9 @@ type DetailEquipoProps = {
 };
 
 const estadoColor: Record<string, string> = {
-    Activo: "bg-green-100 text-green-700 border-green-200",
-    Inactivo: "bg-gray-100 text-gray-600 border-gray-200",
-    "En mantenimiento": "bg-yellow-100 text-yellow-700 border-yellow-200",
-    Dañado: "bg-red-100 text-red-700 border-red-200",
+    Bueno: "bg-green-100 text-green-700 border-green-200",
+    Regular: "bg-gray-100 text-gray-600 border-gray-200",
+    Malo: "bg-red-100 text-red-700 border-red-200",
 };
 
 function formatDate(dateStr: string | null | undefined) {

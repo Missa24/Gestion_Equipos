@@ -153,8 +153,10 @@ export const FormUsuario = ({ initialData, mode, onSuccess }: FormUsuarioProps) 
                                                 <SelectValue placeholder="Seleccionar tipo" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="INTERNO">INTERNO</SelectItem>
-                                                <SelectItem value="EXTERNO">EXTERNO</SelectItem>
+                                                <SelectItem value="ITEM">ITEM</SelectItem>
+                                                <SelectItem value="EVENTUAL">EVENTUAL</SelectItem>
+                                                <SelectItem value="SERVICIO">SERVICIO</SelectItem>
+                                                <SelectItem value="PASANTE">PASANTE</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         {fieldState.invalid && (

@@ -157,10 +157,9 @@ export function EquiposTable() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="todos">Todos los estados</SelectItem>
-                            <SelectItem value="Activo">Activo</SelectItem>
-                            <SelectItem value="Inactivo">Inactivo</SelectItem>
-                            <SelectItem value="En mantenimiento">En mantenimiento</SelectItem>
-                            <SelectItem value="Dañado">Dañado</SelectItem>
+                            <SelectItem value="Activo">Bueno</SelectItem>
+                            <SelectItem value="Inactivo">Regular</SelectItem>
+                            <SelectItem value="En mantenimiento">Malo</SelectItem>
                         </SelectContent>
                     </Select>
 
@@ -170,13 +169,22 @@ export function EquiposTable() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="todos">Todos los tipos</SelectItem>
-                            <SelectItem value="Laptop">Laptop</SelectItem>
-                            <SelectItem value="Desktop">Desktop</SelectItem>
-                            <SelectItem value="Servidor">Servidor</SelectItem>
                             <SelectItem value="Impresora">Impresora</SelectItem>
+                            <SelectItem value="Computadora portátil">Computadora portátil</SelectItem>
+                            <SelectItem value="Computadora de escritorio">Computadora de escritorio</SelectItem>
+                            <SelectItem value="Scanner">Scanner</SelectItem>
+                            <SelectItem value="Disco duro externo">Disco duro externo</SelectItem>
+                            <SelectItem value="Servidor">Servidor</SelectItem>
+                            <SelectItem value="Router">Router</SelectItem>
+                            <SelectItem value="Router switch">Router switch</SelectItem>
                             <SelectItem value="Tablet">Tablet</SelectItem>
+                            <SelectItem value="Dispensador automático de tickets">Dispensador automático de tickets</SelectItem>
+                            <SelectItem value="Memoria RAM">Memoria RAM</SelectItem>
+                            <SelectItem value="UPS">UPS (Sistema de alimentación interrumpida)</SelectItem>
                             <SelectItem value="Monitor">Monitor</SelectItem>
-                            <SelectItem value="Otro">Otro</SelectItem>
+                            <SelectItem value="Cámara de seguridad">Cámara de seguridad</SelectItem>
+                            <SelectItem value="Activo sin asignar">Activo sin asignar</SelectItem>
+                            <SelectItem value="Faltante">Faltante</SelectItem>
                         </SelectContent>
                     </Select>
 
