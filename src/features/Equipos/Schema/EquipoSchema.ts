@@ -1,6 +1,6 @@
 import z from "zod";
 
-// ── Schema de creación (espeja CreateEquipoSchema del backend) ──────────────
+// ── Schema de creación ────────────────────────────────────────────────────────
 export const EquipoCreateSchema = z.object({
     id_usuario: z.number().int().positive("ID de usuario inválido"),
     id_oficina: z.number().int().positive("ID de oficina inválido"),
@@ -13,15 +13,15 @@ export const EquipoCreateSchema = z.object({
     fecha_adquisicion: z.string().min(1, "La fecha de adquisición es requerida"),
     codigo_activo: z.string().max(100).optional().nullable(),
     tipo: z.string().min(1, "El tipo es requerido"),
+    componentes_descripcion: z.string().optional().nullable(),
 });
-
 export type EquipoCreate = z.infer<typeof EquipoCreateSchema>;
 
-// ── Schema para actualización (todos los campos opcionales) ──────────────────
+// ── Schema de actualización ───────────────────────────────────────────────────
 export const EquipoUpdateSchema = EquipoCreateSchema.partial();
 export type EquipoUpdate = z.infer<typeof EquipoUpdateSchema>;
 
-// ── Schema de payload genérico ───────────────────────────────────────────────
+// ── Schema de payload genérico ────────────────────────────────────────────────
 export const EquipoPayloadSchema = z.object({
     id_usuario: z.number().optional(),
     id_oficina: z.number().optional(),
@@ -34,10 +34,11 @@ export const EquipoPayloadSchema = z.object({
     fecha_adquisicion: z.string().optional(),
     codigo_activo: z.string().nullable().optional(),
     tipo: z.string().optional(),
+    componentes_descripcion: z.string().nullable().optional(),
 });
 export type EquipoPayload = z.infer<typeof EquipoPayloadSchema>;
 
-// ── Sub-schemas de relaciones devueltas por el backend ───────────────────────
+// ── Sub-schemas de relaciones ─────────────────────────────────────────────────
 const ComponenteSchema = z.object({
     id_componente: z.number(),
     marca: z.string().nullable(),
@@ -77,13 +78,13 @@ export const EquipoSchema = z.object({
     fecha_adquisicion: z.string(),
     codigo_activo: z.string().nullable(),
     tipo: z.string(),
+    componentes_descripcion: z.string().nullable().optional(),
     fecha_creacion: z.string(),
     fecha_modificacion: z.string(),
     es_eliminado: z.boolean(),
     equiposUsuario: z.array(EquipoUsuarioSchema).optional().default([]),
     componentes: z.array(ComponenteSchema).optional().default([]),
 });
-
 export type Equipo = z.infer<typeof EquipoSchema>;
 
 // ── Respuesta paginada ────────────────────────────────────────────────────────
@@ -101,21 +102,19 @@ export const EquipoGetAllSchema = z.object({
 });
 export type EquipoGetAll = z.infer<typeof EquipoGetAllSchema>;
 
-// ── Respuesta de un equipo por ID ─────────────────────────────────────────────
 export const EquipoGetByIdSchema = z.object({
     message: z.string(),
     data: EquipoSchema,
 });
 export type EquipoGetById = z.infer<typeof EquipoGetByIdSchema>;
 
-// ── Respuesta de creación ─────────────────────────────────────────────────────
 export const EquipoCreateResponseSchema = z.object({
     message: z.string(),
     data: EquipoSchema,
 });
 export type EquipoCreateResponse = z.infer<typeof EquipoCreateResponseSchema>;
 
-// ── Filtros de paginación (espeja EquipoPaginationQuerySchema del backend) ───
+// ── Filtros de paginación ─────────────────────────────────────────────────────
 export const EquipoFiltersSchema = z.object({
     page: z.coerce.number().min(1).default(1),
     limit: z.coerce.number().min(1).max(100).default(10),
