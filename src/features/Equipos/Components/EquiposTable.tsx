@@ -199,7 +199,7 @@ export function EquiposTable() {
                             <SelectValue placeholder="Estado operativo" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="todos">Todos los estados operativos</SelectItem>
+                            <SelectItem value="todos">Todos</SelectItem>
                             <SelectItem value="Operativo">Operativo</SelectItem>
                             <SelectItem value="Faltante">Faltante</SelectItem>
                             <SelectItem value="Acéfalo">Acéfalo</SelectItem>

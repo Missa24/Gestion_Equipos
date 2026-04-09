@@ -122,6 +122,7 @@ export const EquipoFiltersSchema = z.object({
     estado: z.string().optional(),
     estado_operativo: z.string().optional(),
     tipo: z.string().optional(),
+    id_usuario: z.number().optional(),
     search: z.string().optional(),
     fecha_inicio: z.string().optional(),
     fecha_fin: z.string().optional(),
