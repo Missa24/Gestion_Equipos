@@ -12,6 +12,7 @@
     "types": [
       "vite/client"
     ],
+    "ignoreDeprecations": "6.0",
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
