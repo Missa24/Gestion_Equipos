@@ -7,10 +7,27 @@ const apiService = axios.create({
 
 apiService.interceptors.request.use(config => {
     const token = useAuthStore.getState().token;
+
     if (token) {
-        config.headers.Authorization = `Bearer ${token}`
+        config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
-})
+
+    return config;
+});
+
+apiService.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const status = error.response?.status;
+
+        if (status === 401) {
+            const { logout } = useAuthStore.getState();
+            logout();
+            window.location.href = "/login";
+        }
+
+        return Promise.reject(error);
+    }
+);
 
 export { apiService };
