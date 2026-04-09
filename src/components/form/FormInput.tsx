@@ -9,7 +9,7 @@ type OptionType = {
   label: string;
 };
 
-const customStyles: StylesConfig<OptionType, false> = {
+const customStyles: StylesConfig<OptionType, boolean> = {
   control: (provided) => ({
     ...provided,
     backgroundColor: "#ffffff",
@@ -40,7 +40,8 @@ type FormInputProps<T extends FieldValues, D = unknown> = {
   valueKey?: keyof D;
   labelKey?: keyof D;
 };
-export const FormInput = <T extends FieldValues, D = unknown>({
+
+export function FormInput<T extends FieldValues, D = unknown>({
   name,
   control,
   label,
@@ -49,7 +50,7 @@ export const FormInput = <T extends FieldValues, D = unknown>({
   data,
   valueKey,
   labelKey,
-}: FormInputProps<T, D>) => {
+}: FormInputProps<T, D>) {
   return (
     <Controller
       name={name}
@@ -94,9 +95,41 @@ export const FormInput = <T extends FieldValues, D = unknown>({
                 options={options}
                 placeholder={placeholder}
                 value={options.find((o) => o.value === field.value) || null}
-                onChange={(option) => field.onChange(option?.value)}
+                onChange={(option) =>
+                  field.onChange((option as OptionType)?.value)
+                }
                 isSearchable
                 styles={customStyles}
+              />
+            );
+            break;
+          }
+
+          case "multi-select": {
+            const options =
+              data?.map((item) => ({
+                value: item[valueKey as keyof typeof item] as string | number,
+                label: String(item[labelKey as keyof typeof item]),
+              })) ?? [];
+
+            const selectedValues = (field.value as (number | string)[]) ?? [];
+            const selectedOptions = options.filter((o) =>
+              selectedValues.includes(o.value),
+            );
+
+            inputElement = (
+              <Select
+                isMulti
+                options={options}
+                placeholder={placeholder}
+                value={selectedOptions}
+                onChange={(selected) => {
+                  field.onChange(
+                    (selected as OptionType[]).map((o) => o.value),
+                  );
+                }}
+                isSearchable
+                styles={customStyles as StylesConfig<OptionType, true>}
               />
             );
             break;
@@ -124,4 +157,4 @@ export const FormInput = <T extends FieldValues, D = unknown>({
       }}
     />
   );
-};
+}
