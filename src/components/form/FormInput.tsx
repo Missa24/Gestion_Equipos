@@ -3,31 +3,11 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import Select, { StylesConfig } from "react-select";
+import { customStyles } from "../formats/formatTime";
 
 type OptionType = {
   value: number | string;
   label: string;
-};
-
-const customStyles: StylesConfig<OptionType, boolean> = {
-  control: (provided) => ({
-    ...provided,
-    backgroundColor: "#ffffff",
-    color: "#000000",
-  }),
-  menu: (provided) => ({
-    ...provided,
-    backgroundColor: "#ffffff",
-  }),
-  option: (provided, state) => ({
-    ...provided,
-    backgroundColor: state.isSelected
-      ? "#02040a"
-      : state.isFocused
-        ? "#87e064"
-        : "#ffffff",
-    color: state.isSelected ? "#ffffff" : "#000000",
-  }),
 };
 
 type FormInputProps<T extends FieldValues, D = unknown> = {

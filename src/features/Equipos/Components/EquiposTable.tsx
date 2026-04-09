@@ -54,20 +54,30 @@ import { getEquipoColumns } from "./ColumnsEquipo";
 import { FormEquipo } from "./FormEquipo";
 import { DetailEquipo } from "./DetailEquipo";
 import { useAuthStore } from "@/stores/auth.store";
+import { useGetAllUsuarios } from "@/features/Usuarios";
+import ReactSelect from "react-select";
+import { customStylesSelect } from "@/components/formats/formatTime";
 
+type OptionTypeNumber = {
+  value: number;
+  label: string;
+};
 export function EquiposTable() {
   const { user } = useAuthStore();
   const rol = user?.rol.nombre ?? "USER";
 
-    const [page, setPage] = useState(1);
-    const [searchInput, setSearchInput] = useState("");
-    const [search, setSearch] = useState("");
-    const [estado, setEstado] = useState<string | undefined>(undefined);
-    const [estadoOperativo, setEstadoOperativo] = useState<string | undefined>(undefined);
-    const [tipo, setTipo] = useState<string | undefined>(undefined);
-    const [soloMisEquipos, setSoloMisEquipos] = useState(false);
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-
+  const [page, setPage] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [estado, setEstado] = useState<string | undefined>(undefined);
+  const [estadoOperativo, setEstadoOperativo] = useState<string | undefined>(
+    undefined,
+  );
+  const [tipo, setTipo] = useState<string | undefined>(undefined);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState<
+    number | undefined
+  >(undefined);
   // Dialogs state
   const [createOpen, setCreateOpen] = useState(false);
   const [editRow, setEditRow] = useState<Equipo | null>(null);
@@ -75,6 +85,12 @@ export function EquiposTable() {
   const [deleteRow, setDeleteRow] = useState<Equipo | null>(null);
 
   const { mutate: deleteEquipo, isPending: deleting } = useDeleteEquipo();
+  const { data: usuariosData } = useGetAllUsuarios({ page: 1, limit: 100 });
+  const usuarios = usuariosData?.data ?? [];
+  const usuarioOptions = usuarios.map((u) => ({
+    value: u.id_usuario,
+    label: `${u.nombres} ${u.apellidos}`,
+  }));
 
   const LIMIT = 10;
 
@@ -87,15 +103,15 @@ export function EquiposTable() {
     return () => clearTimeout(timeout);
   }, [searchInput]);
 
-    const filters: EquipoFilters = {
-        page,
-        limit: LIMIT,
-        ...(search && { search }),
-        ...(estado && { estado }),
-        ...(estadoOperativo && { estado_operativo: estadoOperativo }),
-        ...(tipo && { tipo }),
-        ...(soloMisEquipos && user?.id_usuario ? { id_usuario: user.id_usuario } : {}),
-    };
+  const filters: EquipoFilters = {
+    page,
+    limit: LIMIT,
+    ...(search && { search }),
+    ...(estado && { estado }),
+    ...(estadoOperativo && { estado_operativo: estadoOperativo }),
+    ...(tipo && { tipo }),
+    ...(usuarioSeleccionado && { id_usuario: usuarioSeleccionado }),
+  };
 
   const { data: response, isLoading, isFetching } = useGetAllEquipos(filters);
   const data = response?.data ?? [];
@@ -121,25 +137,20 @@ export function EquiposTable() {
     rowCount: pagination?.total ?? 0,
   });
 
-    function handleEstadoChange(val: string) {
-        setEstado(val === "todos" ? undefined : val);
-        setPage(1);
-    }
+  function handleEstadoChange(val: string) {
+    setEstado(val === "todos" ? undefined : val);
+    setPage(1);
+  }
 
-    function handleEstadoOperativoChange(val: string) {
-        setEstadoOperativo(val === "todos" ? undefined : val);
-        setPage(1);
-    }
+  function handleEstadoOperativoChange(val: string) {
+    setEstadoOperativo(val === "todos" ? undefined : val);
+    setPage(1);
+  }
 
-    function handleTipoChange(val: string) {
-        setTipo(val === "todos" ? undefined : val);
-        setPage(1);
-    }
-
-    function handleMisEquiposChange(val: string) {
-        setSoloMisEquipos(val === "mis");
-        setPage(1);
-    }
+  function handleTipoChange(val: string) {
+    setTipo(val === "todos" ? undefined : val);
+    setPage(1);
+  }
 
   function confirmDelete() {
     if (!deleteRow) return;
@@ -165,74 +176,87 @@ export function EquiposTable() {
           />
         </div>
 
-                <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Filtro: Mis equipos / Todos */}
+          <ReactSelect<OptionTypeNumber, false>
+            placeholder="Buscar usuario..."
+            isClearable
+            options={usuarioOptions}
+            styles={customStylesSelect}
+            onChange={(option) => {
+              setUsuarioSeleccionado(option?.value);
+              setPage(1);
+            }}
+          />
+          {/* Filtro: Estado */}
+          <Select value={estado ?? "todos"} onValueChange={handleEstadoChange}>
+            <SelectTrigger className="h-9 w-[130px]">
+              <SelectValue placeholder="Estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos los estados</SelectItem>
+              <SelectItem value="Bueno">Bueno</SelectItem>
+              <SelectItem value="Regular">Regular</SelectItem>
+              <SelectItem value="Malo">Malo</SelectItem>
+            </SelectContent>
+          </Select>
 
-                    {/* Filtro: Mis equipos / Todos */}
-                    <Select
-                        value={soloMisEquipos ? "mis" : "todos"}
-                        onValueChange={handleMisEquiposChange}
-                    >
-                        <SelectTrigger className="h-9 w-[155px]">
-                            <SelectValue placeholder="Responsable" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="todos">Todos los equipos</SelectItem>
-                            <SelectItem value="mis">Mis equipos</SelectItem>
-                        </SelectContent>
-                    </Select>
+          {/* Filtro: Estado operativo */}
+          <Select
+            value={estadoOperativo ?? "todos"}
+            onValueChange={handleEstadoOperativoChange}
+          >
+            <SelectTrigger className="h-9 w-[145px]">
+              <SelectValue placeholder="Estado operativo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="Operativo">Operativo</SelectItem>
+              <SelectItem value="Faltante">Faltante</SelectItem>
+              <SelectItem value="Acéfalo">Acéfalo</SelectItem>
+              <SelectItem value="Sin asignar">Sin asignar</SelectItem>
+            </SelectContent>
+          </Select>
 
-                    {/* Filtro: Estado */}
-                    <Select value={estado ?? "todos"} onValueChange={handleEstadoChange}>
-                        <SelectTrigger className="h-9 w-[130px]">
-                            <SelectValue placeholder="Estado" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="todos">Todos los estados</SelectItem>
-                            <SelectItem value="Bueno">Bueno</SelectItem>
-                            <SelectItem value="Regular">Regular</SelectItem>
-                            <SelectItem value="Malo">Malo</SelectItem>
-                        </SelectContent>
-                    </Select>
-
-                    {/* Filtro: Estado operativo */}
-                    <Select value={estadoOperativo ?? "todos"} onValueChange={handleEstadoOperativoChange}>
-                        <SelectTrigger className="h-9 w-[145px]">
-                            <SelectValue placeholder="Estado operativo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="todos">Todos</SelectItem>
-                            <SelectItem value="Operativo">Operativo</SelectItem>
-                            <SelectItem value="Faltante">Faltante</SelectItem>
-                            <SelectItem value="Acéfalo">Acéfalo</SelectItem>
-                            <SelectItem value="Sin asignar">Sin asignar</SelectItem>
-                        </SelectContent>
-                    </Select>
-
-                    {/* Filtro: Tipo */}
-                    <Select value={tipo ?? "todos"} onValueChange={handleTipoChange}>
-                        <SelectTrigger className="h-9 w-[145px]">
-                            <SelectValue placeholder="Tipo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="todos">Todos los tipos</SelectItem>
-                            <SelectItem value="Impresora">Impresora</SelectItem>
-                            <SelectItem value="Computadora portátil">Computadora portátil</SelectItem>
-                            <SelectItem value="Computadora de escritorio">Computadora de escritorio</SelectItem>
-                            <SelectItem value="Scanner">Scanner</SelectItem>
-                            <SelectItem value="Disco duro externo">Disco duro externo</SelectItem>
-                            <SelectItem value="Servidor">Servidor</SelectItem>
-                            <SelectItem value="Router">Router</SelectItem>
-                            <SelectItem value="Router switch">Router switch</SelectItem>
-                            <SelectItem value="Tablet">Tablet</SelectItem>
-                            <SelectItem value="Dispensador automático de tickets">Dispensador automático de tickets</SelectItem>
-                            <SelectItem value="Memoria RAM">Memoria RAM</SelectItem>
-                            <SelectItem value="UPS (Sistema de alimentación interrumpida)">UPS</SelectItem>
-                            <SelectItem value="Monitor">Monitor</SelectItem>
-                            <SelectItem value="Cámara de seguridad">Cámara de seguridad</SelectItem>
-                            <SelectItem value="Activo sin asignar">Activo sin asignar</SelectItem>
-                            <SelectItem value="Faltante">Faltante</SelectItem>
-                        </SelectContent>
-                    </Select>
+          {/* Filtro: Tipo */}
+          <Select value={tipo ?? "todos"} onValueChange={handleTipoChange}>
+            <SelectTrigger className="h-9 w-[145px]">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos los tipos</SelectItem>
+              <SelectItem value="Impresora">Impresora</SelectItem>
+              <SelectItem value="Computadora portátil">
+                Computadora portátil
+              </SelectItem>
+              <SelectItem value="Computadora de escritorio">
+                Computadora de escritorio
+              </SelectItem>
+              <SelectItem value="Scanner">Scanner</SelectItem>
+              <SelectItem value="Disco duro externo">
+                Disco duro externo
+              </SelectItem>
+              <SelectItem value="Servidor">Servidor</SelectItem>
+              <SelectItem value="Router">Router</SelectItem>
+              <SelectItem value="Router switch">Router switch</SelectItem>
+              <SelectItem value="Tablet">Tablet</SelectItem>
+              <SelectItem value="Dispensador automático de tickets">
+                Dispensador automático de tickets
+              </SelectItem>
+              <SelectItem value="Memoria RAM">Memoria RAM</SelectItem>
+              <SelectItem value="UPS (Sistema de alimentación interrumpida)">
+                UPS
+              </SelectItem>
+              <SelectItem value="Monitor">Monitor</SelectItem>
+              <SelectItem value="Cámara de seguridad">
+                Cámara de seguridad
+              </SelectItem>
+              <SelectItem value="Activo sin asignar">
+                Activo sin asignar
+              </SelectItem>
+              <SelectItem value="Faltante">Faltante</SelectItem>
+            </SelectContent>
+          </Select>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -388,50 +412,53 @@ export function EquiposTable() {
         </div>
       </div>
 
-            {/* Dialog: Crear */}
-            <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-                <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-                    <DialogHeader>
-                        <DialogTitle>Registrar equipo</DialogTitle>
-                    </DialogHeader>
-                    <div className="overflow-y-auto flex-1 pr-1">
-                        <FormEquipo
-                            mode="create"
-                            onSuccess={() => setCreateOpen(false)}
-                        />
-                    </div>
-                </DialogContent>
-            </Dialog>
+      {/* Dialog: Crear */}
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Registrar equipo</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto flex-1 pr-1">
+            <FormEquipo mode="create" onSuccess={() => setCreateOpen(false)} />
+          </div>
+        </DialogContent>
+      </Dialog>
 
-            {/* Dialog: Editar */}
-            <Dialog open={!!editRow} onOpenChange={(open: boolean) => !open && setEditRow(null)}>
-                <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-                    <DialogHeader>
-                        <DialogTitle>Editar equipo</DialogTitle>
-                    </DialogHeader>
-                    <div className="overflow-y-auto flex-1 pr-1">
-                        {editRow && (
-                            <FormEquipo
-                                initialData={editRow}
-                                mode="edit"
-                                onSuccess={() => setEditRow(null)}
-                            />
-                        )}
-                    </div>
-                </DialogContent>
-            </Dialog>
+      {/* Dialog: Editar */}
+      <Dialog
+        open={!!editRow}
+        onOpenChange={(open: boolean) => !open && setEditRow(null)}
+      >
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Editar equipo</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto flex-1 pr-1">
+            {editRow && (
+              <FormEquipo
+                initialData={editRow}
+                mode="edit"
+                onSuccess={() => setEditRow(null)}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
-            {/* Dialog: Ver detalle */}
-            <Dialog open={!!viewRow} onOpenChange={(open: boolean) => !open && setViewRow(null)}>
-                <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-                    <DialogHeader>
-                        <DialogTitle>Detalle del equipo</DialogTitle>
-                    </DialogHeader>
-                    <div className="overflow-y-auto flex-1 pr-1">
-                        {viewRow && <DetailEquipo equipo={viewRow} />}
-                    </div>
-                </DialogContent>
-            </Dialog>
+      {/* Dialog: Ver detalle */}
+      <Dialog
+        open={!!viewRow}
+        onOpenChange={(open: boolean) => !open && setViewRow(null)}
+      >
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Detalle del equipo</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto flex-1 pr-1">
+            {viewRow && <DetailEquipo equipo={viewRow} />}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog: Confirmar eliminación */}
       <Dialog
