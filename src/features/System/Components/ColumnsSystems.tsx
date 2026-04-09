@@ -2,15 +2,15 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Sistema } from "../Schema/SystemSchema";
 import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DialogSystem } from "./DialogSystem";
+import { Link } from "react-router-dom";
 
 const estadoColor: Record<string, string> = {
   Activo: "bg-green-100 text-green-700 border-green-200",
   Inactivo: "bg-red-100 text-red-700 border-red-200",
 };
 
-export function getColumns(
-  onView: (row: Sistema) => void,
-): ColumnDef<Sistema>[] {
+export function getColumns(): ColumnDef<Sistema>[] {
   return [
     {
       accessorKey: "nombre",
@@ -50,7 +50,7 @@ export function getColumns(
       accessorKey: "tamaño",
       header: "Tamaño",
       cell: ({ row }) => (
-        <span className="text-sm">{row.getValue("tamaño") ?? "N/A"} GB</span>
+        <span className="text-sm">{row.getValue("tamaño") ?? "N/A"}</span>
       ),
     },
     {
@@ -89,14 +89,16 @@ export function getColumns(
       id: "acciones",
       header: () => <span className="sr-only">Acciones</span>,
       cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={() => onView(row.original)}
-        >
-          <Eye className="h-4 w-4" />
-        </Button>
+        <>
+          <div className="flex items-center gap-1">
+            <DialogSystem mode="edit" text="Editar" row={row.original} />
+            <Link to={`/dashboard/sistemas/${row.original.id_sistema}`}>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Eye className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </>
       ),
     },
   ];

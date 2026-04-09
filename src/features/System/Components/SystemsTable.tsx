@@ -35,17 +35,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-import { Sistema, SystemFilters } from "../Schema/SystemSchema";
+import { useEffect, useMemo, useState } from "react";
+import { SystemFilters } from "../Schema/SystemSchema";
 import { useGetAllSystems } from "../Hooks/SystemHook";
 import { getColumns } from "./ColumnsSystems";
+import { DialogSystem } from "./DialogSystem";
 
 export function SystemsTable() {
-  const navigate = useNavigate();
-
   const [page, setPage] = useState(1);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
@@ -69,16 +65,9 @@ export function SystemsTable() {
 
   const { data = [], isLoading, isFetching } = useGetAllSystems(filters);
 
-  const handleView = useCallback(
-    (row: Sistema) => {
-      navigate(`/dashboard/sistemas/${row.id_sistema}`);
-    },
-    [navigate],
-  );
+  const columns = useMemo(() => getColumns(), []);
 
-  const columns = useMemo(() => getColumns(handleView), [handleView]);
-
-  // eslint-disable-next-line react-hooks/incompatible-library
+  //   eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
@@ -92,6 +81,7 @@ export function SystemsTable() {
 
   return (
     <div className="space-y-4">
+      <DialogSystem mode="create" text="Crear Sistema" />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
