@@ -82,7 +82,7 @@ export const FormSupportEdit = ({
     <Card className="w-full">
       <CardHeader>
         <CardTitle>
-          {mode === "edit" ? "Editar Ticket" : "Nuevo Ticket"}
+          {mode === "edit" ? "Ticket" : "Ticket"}
         </CardTitle>
 
         <CardDescription>

@@ -30,11 +30,13 @@ export function DialogSupport({ text, mode, row }: DialogSupportProps) {
         )}
       </DialogTrigger>
 
-      <DialogContent className="max-w-2xl w-full h-[90vh] overflow-auto sm:rounded-lg">
+      <DialogContent className="max-w-2xl w-full h-[90vh] overflow-auto sm:rounded-lg p-6 flex flex-col gap-4">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
+          <DialogTitle>
+            {mode === "edit" ? "Editar Ticket" : "Nuevo Ticket"}
+          </DialogTitle>
           <DialogDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
+            Crea un nuevo ticket de solicitud
           </DialogDescription>
         </DialogHeader>
         {mode === "edit" ? (

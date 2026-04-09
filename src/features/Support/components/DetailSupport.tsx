@@ -7,7 +7,7 @@ import { ArrowLeft, Bolt, AlertCircle } from "lucide-react";
 import { useAcceptSupport } from "../hooks/SupportHooks";
 import { Title } from "@/components/ui/title";
 import { formatDate } from "@/components/formats/formatTime";
-import CardInfo from "@/components/ui/CardInfo";
+import CardInfo from "@/components/ui/cardInfo";
 
 type DetailSupportProps = {
   id: number;
