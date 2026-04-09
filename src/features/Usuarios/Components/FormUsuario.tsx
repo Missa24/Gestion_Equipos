@@ -142,47 +142,52 @@ export const FormUsuario = ({
               />
             </div>
 
-            {/* Cargo / Tipo */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Controller
-                name="cargo"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Cargo</FieldLabel>
-                    <Input
-                      {...field}
-                      placeholder="Técnico de sistemas"
-                      aria-invalid={fieldState.invalid}
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="tipo"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Tipo</FieldLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger aria-invalid={fieldState.invalid}>
-                        <SelectValue placeholder="Seleccionar tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="INTERNO">INTERNO</SelectItem>
-                        <SelectItem value="EXTERNO">EXTERNO</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            </div>
+                        {/* Cargo / Tipo */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <Controller
+                                name="cargo"
+                                control={form.control}
+                                render={({ field, fieldState }) => (
+                                    <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel>Cargo</FieldLabel>
+                                        <Input
+                                            {...field}
+                                            placeholder="Técnico de sistemas"
+                                            aria-invalid={fieldState.invalid}
+                                        />
+                                        {fieldState.invalid && (
+                                            <FieldError errors={[fieldState.error]} />
+                                        )}
+                                    </Field>
+                                )}
+                            />
+                            <Controller
+                                name="tipo"
+                                control={form.control}
+                                render={({ field, fieldState }) => (
+                                    <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel>Tipo</FieldLabel>
+                                        <Select
+                                            value={field.value}
+                                            onValueChange={field.onChange}
+                                        >
+                                            <SelectTrigger aria-invalid={fieldState.invalid}>
+                                                <SelectValue placeholder="Seleccionar tipo" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="ITEM">ITEM</SelectItem>
+                                                <SelectItem value="EVENTUAL">EVENTUAL</SelectItem>
+                                                <SelectItem value="SERVICIO">SERVICIO</SelectItem>
+                                                <SelectItem value="PASANTE">PASANTE</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {fieldState.invalid && (
+                                            <FieldError errors={[fieldState.error]} />
+                                        )}
+                                    </Field>
+                                )}
+                            />
+                        </div>
 
             {/* CI / Celular */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

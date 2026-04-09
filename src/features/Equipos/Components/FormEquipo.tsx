@@ -2,15 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
     Select,
     SelectContent,
@@ -18,6 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
 import { useCreateEquipo, useUpdateEquipo } from "../Hooks/EquipoHooks";
 import { Equipo, EquipoPayload, EquipoPayloadSchema } from "../Schema/EquipoSchema";
 import { useAuthStore } from "@/stores/auth.store";
@@ -27,6 +21,25 @@ type FormEquipoProps = {
     mode: "create" | "edit";
     onSuccess?: () => void;
 };
+
+const TIPOS = [
+    "Impresora",
+    "Computadora portátil",
+    "Computadora de escritorio",
+    "Scanner",
+    "Disco duro externo",
+    "Servidor",
+    "Router",
+    "Router switch",
+    "Tablet",
+    "Dispensador automático de tickets",
+    "Memoria RAM",
+    "UPS (Sistema de alimentación interrumpida)",
+    "Monitor",
+    "Cámara de seguridad",
+    "Activo sin asignar",
+    "Faltante",
+];
 
 export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) => {
     const { user } = useAuthStore();
@@ -42,7 +55,8 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
             marca: initialData?.marca ?? "",
             modelo: initialData?.modelo ?? "",
             numero_serie: initialData?.numero_serie ?? "",
-            estado: initialData?.estado ?? "Activo",
+            estado: initialData?.estado ?? "",
+            estado_operativo: initialData?.estado_operativo ?? "",
             ubicacion: initialData?.ubicacion ?? "",
             fecha_adquisicion: initialData?.fecha_adquisicion
                 ? initialData.fecha_adquisicion.substring(0, 10)
@@ -64,18 +78,28 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
     }
 
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <CardTitle>{mode === "edit" ? "Editar Equipo" : "Nuevo Equipo"}</CardTitle>
-                <CardDescription>
+        <div className="space-y-6">
+            {/* Header */}
+            <div>
+                <h3 className="text-base font-semibold leading-6">
+                    {mode === "edit" ? "Editar equipo" : "Nuevo equipo"}
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
                     {mode === "edit"
                         ? `${initialData?.marca} ${initialData?.modelo} — N° ${initialData?.numero_serie}`
-                        : "Registra un nuevo equipo en el sistema"}
-                </CardDescription>
-            </CardHeader>
+                        : "Completa los campos para registrar un nuevo equipo."}
+                </p>
+            </div>
 
-            <CardContent>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+            <Separator />
+
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
+                {/* ── Sección: Identificación ── */}
+                <div className="space-y-4">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Identificación
+                    </p>
                     <FieldGroup>
                         {/* Marca / Modelo */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -104,7 +128,7 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
                                         <FieldLabel>Modelo</FieldLabel>
                                         <Input
                                             {...field}
-                                            placeholder="Latitude 5540, ThinkPad…"
+                                            placeholder="OptiPlex 7050, ThinkPad…"
                                             aria-invalid={fieldState.invalid}
                                         />
                                         {fieldState.invalid && (
@@ -115,75 +139,14 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
                             />
                         </div>
 
-                        {/* Tipo / Estado */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <Controller
-                                name="tipo"
-                                control={form.control}
-                                render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid}>
-                                        <FieldLabel>Tipo</FieldLabel>
-                                        <Select
-                                            value={field.value}
-                                            onValueChange={field.onChange}
-                                        >
-                                            <SelectTrigger aria-invalid={fieldState.invalid}>
-                                                <SelectValue placeholder="Seleccionar tipo" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Laptop">Laptop</SelectItem>
-                                                <SelectItem value="Desktop">Desktop</SelectItem>
-                                                <SelectItem value="Servidor">Servidor</SelectItem>
-                                                <SelectItem value="Impresora">Impresora</SelectItem>
-                                                <SelectItem value="Tablet">Tablet</SelectItem>
-                                                <SelectItem value="Monitor">Monitor</SelectItem>
-                                                <SelectItem value="Otro">Otro</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        {fieldState.invalid && (
-                                            <FieldError errors={[fieldState.error]} />
-                                        )}
-                                    </Field>
-                                )}
-                            />
-                            <Controller
-                                name="estado"
-                                control={form.control}
-                                render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid}>
-                                        <FieldLabel>Estado</FieldLabel>
-                                        <Select
-                                            value={field.value}
-                                            onValueChange={field.onChange}
-                                        >
-                                            <SelectTrigger aria-invalid={fieldState.invalid}>
-                                                <SelectValue placeholder="Seleccionar estado" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Activo">Activo</SelectItem>
-                                                <SelectItem value="Inactivo">Inactivo</SelectItem>
-                                                <SelectItem value="En mantenimiento">
-                                                    En mantenimiento
-                                                </SelectItem>
-                                                <SelectItem value="Dañado">Dañado</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        {fieldState.invalid && (
-                                            <FieldError errors={[fieldState.error]} />
-                                        )}
-                                    </Field>
-                                )}
-                            />
-                        </div>
-
-                        {/* Número de serie / Código activo */}
+                        {/* Nro. de serie / Código activo */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <Controller
                                 name="numero_serie"
                                 control={form.control}
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
-                                        <FieldLabel>Número de serie</FieldLabel>
+                                        <FieldLabel>Nro. de serie</FieldLabel>
                                         <Input
                                             {...field}
                                             placeholder="SN-XXXXXXXXX"
@@ -214,8 +177,100 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
                                 )}
                             />
                         </div>
+                    </FieldGroup>
+                </div>
 
-                        {/* Ubicación / Fecha adquisición */}
+                <Separator />
+
+                {/* ── Sección: Clasificación ── */}
+                <div className="space-y-4">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Clasificación
+                    </p>
+                    <FieldGroup>
+                        {/* Tipo (fila completa) */}
+                        <Controller
+                            name="tipo"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel>Tipo</FieldLabel>
+                                    <Select value={field.value} onValueChange={field.onChange}>
+                                        <SelectTrigger aria-invalid={fieldState.invalid}>
+                                            <SelectValue placeholder="Seleccionar tipo" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {TIPOS.map((t) => (
+                                                <SelectItem key={t} value={t}>{t}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {fieldState.invalid && (
+                                        <FieldError errors={[fieldState.error]} />
+                                    )}
+                                </Field>
+                            )}
+                        />
+
+                        {/* Estado / Estado operativo */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <Controller
+                                name="estado"
+                                control={form.control}
+                                render={({ field, fieldState }) => (
+                                    <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel>Estado</FieldLabel>
+                                        <Select value={field.value} onValueChange={field.onChange}>
+                                            <SelectTrigger aria-invalid={fieldState.invalid}>
+                                                <SelectValue placeholder="Seleccionar estado" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Bueno">Bueno</SelectItem>
+                                                <SelectItem value="Regular">Regular</SelectItem>
+                                                <SelectItem value="Malo">Malo</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {fieldState.invalid && (
+                                            <FieldError errors={[fieldState.error]} />
+                                        )}
+                                    </Field>
+                                )}
+                            />
+                            <Controller
+                                name="estado_operativo"
+                                control={form.control}
+                                render={({ field, fieldState }) => (
+                                    <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel>Estado operativo</FieldLabel>
+                                        <Select value={field.value} onValueChange={field.onChange}>
+                                            <SelectTrigger aria-invalid={fieldState.invalid}>
+                                                <SelectValue placeholder="Seleccionar estado operativo" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Operativo">Operativo</SelectItem>
+                                                <SelectItem value="Faltante">Faltante</SelectItem>
+                                                <SelectItem value="Acéfalo">Acéfalo</SelectItem>
+                                                <SelectItem value="Sin asignar">Sin asignar</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {fieldState.invalid && (
+                                            <FieldError errors={[fieldState.error]} />
+                                        )}
+                                    </Field>
+                                )}
+                            />
+                        </div>
+                    </FieldGroup>
+                </div>
+
+                <Separator />
+
+                {/* ── Sección: Ubicación y registro ── */}
+                <div className="space-y-4">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Ubicación y registro
+                    </p>
+                    <FieldGroup>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <Controller
                                 name="ubicacion"
@@ -252,8 +307,17 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
                                 )}
                             />
                         </div>
+                    </FieldGroup>
+                </div>
 
-                        {/* ID Usuario / ID Oficina */}
+                <Separator />
+
+                {/* ── Sección: Asignación ── */}
+                <div className="space-y-4">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Asignación
+                    </p>
+                    <FieldGroup>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <Controller
                                 name="id_usuario"
@@ -264,9 +328,7 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
                                         <Input
                                             {...field}
                                             type="number"
-                                            onChange={(e) =>
-                                                field.onChange(Number(e.target.value))
-                                            }
+                                            onChange={(e) => field.onChange(Number(e.target.value))}
                                             aria-invalid={fieldState.invalid}
                                         />
                                         {fieldState.invalid && (
@@ -284,9 +346,7 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
                                         <Input
                                             {...field}
                                             type="number"
-                                            onChange={(e) =>
-                                                field.onChange(Number(e.target.value))
-                                            }
+                                            onChange={(e) => field.onChange(Number(e.target.value))}
                                             aria-invalid={fieldState.invalid}
                                         />
                                         {fieldState.invalid && (
@@ -297,20 +357,24 @@ export const FormEquipo = ({ initialData, mode, onSuccess }: FormEquipoProps) =>
                             />
                         </div>
                     </FieldGroup>
+                </div>
 
-                    <CardFooter className="mt-6 px-0 pb-0">
-                        <Button type="submit" className="w-full" disabled={isPending}>
-                            {isPending
-                                ? mode === "edit"
-                                    ? "Guardando..."
-                                    : "Creando..."
-                                : mode === "edit"
-                                    ? "Guardar cambios"
-                                    : "Registrar equipo"}
-                        </Button>
-                    </CardFooter>
-                </form>
-            </CardContent>
-        </Card>
+                {/* Footer */}
+                <div className="flex justify-end pt-2">
+                    <Button type="submit" disabled={isPending} className="min-w-32">
+                        {isPending ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                {mode === "edit" ? "Guardando…" : "Creando…"}
+                            </>
+                        ) : mode === "edit" ? (
+                            "Guardar cambios"
+                        ) : (
+                            "Registrar equipo"
+                        )}
+                    </Button>
+                </div>
+            </form>
+        </div>
     );
 };

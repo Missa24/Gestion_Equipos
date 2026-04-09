@@ -1,25 +1,158 @@
 import { Equipo } from "../Schema/EquipoSchema";
 import { Separator } from "@/components/ui/separator";
-import { CalendarDays, Cpu, Hash, MapPin, Monitor, Tag, User } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+    CalendarDays,
+    Cpu,
+    Hash,
+    MapPin,
+    Monitor,
+    Tag,
+    User,
+    Wrench,
+    Clock,
+    CheckCircle2,
+    AlertCircle,
+    CircleDashed,
+} from "lucide-react";
+import { useGetAllSupport } from "@/features/Support/hooks/SupportHooks";
+import { Application } from "@/features/Support/schema/SupportSchema";
 
 type DetailEquipoProps = {
     equipo: Equipo;
 };
 
+// ── Colores de estado del equipo ─────────────────────────────────────────────
 const estadoColor: Record<string, string> = {
     Activo: "bg-green-100 text-green-700 border-green-200",
+    Bueno: "bg-green-100 text-green-700 border-green-200",
+    Regular: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    Malo: "bg-red-100 text-red-700 border-red-200",
     Inactivo: "bg-gray-100 text-gray-600 border-gray-200",
     "En mantenimiento": "bg-yellow-100 text-yellow-700 border-yellow-200",
     Dañado: "bg-red-100 text-red-700 border-red-200",
 };
 
-function formatDate(dateStr: string | null | undefined) {
-    if (!dateStr) return "—";
-    return new Intl.DateTimeFormat("es-BO", { dateStyle: "long" }).format(new Date(dateStr));
+// ── Colores y iconos de estado del soporte ───────────────────────────────────
+function SoporteEstadoBadge({ estado }: { estado: string }) {
+    const map: Record<string, { color: string; icon: React.ReactNode }> = {
+        Pendiente: {
+            color: "bg-yellow-50 text-yellow-700 border-yellow-200",
+            icon: <CircleDashed className="h-3 w-3" />,
+        },
+        "En progreso": {
+            color: "bg-blue-50 text-blue-700 border-blue-200",
+            icon: <Clock className="h-3 w-3" />,
+        },
+        Resuelto: {
+            color: "bg-green-50 text-green-700 border-green-200",
+            icon: <CheckCircle2 className="h-3 w-3" />,
+        },
+        Cancelado: {
+            color: "bg-gray-100 text-gray-600 border-gray-200",
+            icon: <AlertCircle className="h-3 w-3" />,
+        },
+    };
+    const cfg = map[estado] ?? {
+        color: "bg-gray-100 text-gray-600 border-gray-200",
+        icon: <CircleDashed className="h-3 w-3" />,
+    };
+    return (
+        <span
+            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${cfg.color}`}
+        >
+            {cfg.icon}
+            {estado}
+        </span>
+    );
 }
 
+// ── Colores de prioridad ─────────────────────────────────────────────────────
+const prioridadColor: Record<string, string> = {
+    Alta: "text-red-600 font-semibold",
+    Media: "text-yellow-600 font-semibold",
+    Baja: "text-green-600 font-semibold",
+};
+
+function formatDate(dateStr: string | null | undefined) {
+    if (!dateStr) return "—";
+    return new Intl.DateTimeFormat("es-BO", { dateStyle: "medium" }).format(
+        new Date(dateStr)
+    );
+}
+
+// ── Tarjeta de una solicitud de soporte ─────────────────────────────────────
+function SoporteCard({ soporte }: { soporte: Application }) {
+    return (
+        <div className="rounded-lg border bg-muted/20 px-4 py-3 space-y-2">
+            {/* Fila superior */}
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs text-muted-foreground">
+                        {soporte.nro_de_solicitud}
+                    </span>
+                    <SoporteEstadoBadge estado={soporte.estado} />
+                </div>
+                <span
+                    className={`text-xs ${prioridadColor[soporte.prioridad] ?? "text-muted-foreground"}`}
+                >
+                    Prioridad: {soporte.prioridad}
+                </span>
+            </div>
+
+            {/* Problema */}
+            <p className="text-sm font-medium">{soporte.problema}</p>
+
+            {/* Resolución */}
+            {soporte.resolucion && (
+                <p className="text-xs text-muted-foreground border-l-2 border-muted pl-2">
+                    {soporte.resolucion}
+                </p>
+            )}
+
+            {/* Pie */}
+            <div className="flex items-center justify-between gap-4 text-xs text-muted-foreground flex-wrap pt-1">
+                <span>
+                    Solicitado por{" "}
+                    <span className="font-medium text-foreground">
+                        {soporte.usuario.nombres} {soporte.usuario.apellidos}
+                    </span>
+                </span>
+                <div className="flex items-center gap-3">
+                    {soporte.tecnico && (
+                        <span>
+                            Técnico:{" "}
+                            <span className="font-medium text-foreground">
+                                {soporte.tecnico.nombres} {soporte.tecnico.apellidos}
+                            </span>
+                        </span>
+                    )}
+                    <span className="flex items-center gap-1">
+                        <CalendarDays className="h-3 w-3" />
+                        {formatDate(soporte.fecha_solicitud)}
+                    </span>
+                    {soporte.fecha_solucion && (
+                        <span className="flex items-center gap-1 text-green-600">
+                            <CheckCircle2 className="h-3 w-3" />
+                            {formatDate(soporte.fecha_solucion)}
+                        </span>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ── Componente principal ─────────────────────────────────────────────────────
 export const DetailEquipo = ({ equipo }: DetailEquipoProps) => {
     const usuarioActual = equipo.equiposUsuario?.find((eu) => !eu.fecha_de_baja);
+
+    const { data: soporteResponse, isLoading: loadingSoporte } = useGetAllSupport({
+        id_equipo: equipo.id_equipo,
+        limit: 50,
+        page: 1,
+    });
+    const soportes = soporteResponse?.data ?? [];
 
     return (
         <div className="space-y-5 text-sm">
@@ -125,6 +258,39 @@ export const DetailEquipo = ({ equipo }: DetailEquipoProps) => {
                     </div>
                 </>
             )}
+
+            {/* ── Historial de soporte ── */}
+            <Separator />
+            <div>
+                <div className="flex items-center gap-2 mb-3">
+                    <Wrench className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Historial de soporte
+                        {!loadingSoporte && soportes.length > 0 && (
+                            <span className="ml-1 normal-case font-normal">
+                                ({soportes.length})
+                            </span>
+                        )}
+                    </p>
+                </div>
+
+                {loadingSoporte ? (
+                    <div className="space-y-2">
+                        <Skeleton className="h-20 w-full rounded-lg" />
+                        <Skeleton className="h-20 w-full rounded-lg" />
+                    </div>
+                ) : soportes.length > 0 ? (
+                    <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                        {soportes.map((s) => (
+                            <SoporteCard key={s.id_soporte} soporte={s} />
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-sm text-muted-foreground py-4 text-center rounded-lg border border-dashed">
+                        Este equipo no tiene solicitudes de soporte registradas.
+                    </p>
+                )}
+            </div>
         </div>
     );
 };
