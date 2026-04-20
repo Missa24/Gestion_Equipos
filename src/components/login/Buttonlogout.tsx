@@ -6,8 +6,10 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAuthStore } from "@/stores/auth.store";
 
 function ButtonLogOut() {
+    const { logout } = useAuthStore();
 
     return (
         <TooltipProvider delayDuration={150}>
@@ -17,7 +19,7 @@ function ButtonLogOut() {
                         type="button"
                         variant="ghost"
                         size="icon"
-                        //                        onClick={logout}
+                        onClick={logout}
                         className="
                self-center
               bg-neutral-100 dark:bg-neutral-800
